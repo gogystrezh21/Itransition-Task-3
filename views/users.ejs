@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.1/css/bootstrap.min.css" integrity="sha512-T584yQ/tdRR5QwOpfvDfVQUidzfgc2339Lc8uBDtcp/wYu80d7jwBgAxbyMh0a9YM9F8N3tdErpFI8iaGx6x5g==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.1/js/bootstrap.min.js" integrity="sha512-UR25UO94eTnCVwjbXozyeVd6ZqpaAE9naiEUBK/A+QDbfSTQFhPGj5lOR6d8tsgbBk84Ggb5A3EkjsOgPRPcKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>App-Users</title>
+</head>
+<body>
+    <h2>List of Users</h2>
+    <button class="btn btn-outline-secondary" type="button" id="button-addon1" onclick="remove('box22')" href="javascript:void(0);">Delete</button>
+    <button class="btn btn-outline-secondary" type="button" id="button-addon2" style="background-color: rgb(207, 58, 58);">Block</button>
+    <button class="btn btn-outline-secondary" type="button" id="button-addon3" >Un block</button>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">
+            <div class="form-check">
+            <input class="form-check-input" onclick="toggle(this);" type="checkbox" value="" id="flexCheckDefault" >
+            <label class="form-check-label" for="flexCheckDefault">
+            </label>
+          </div></th>
+        <th scope="col">User ID</th>
+        <th scope="col">User Name</th>
+        <th scope="col">User Email</th>
+        <th scope="col">User Registration Time</th>
+        <th scope="col">User Authorization Time</th>
+        <th scope="col">User Status</th>
+      </tr>
+    </thead>
+    <tbody id="box22">
+        <% users.forEach(function(user){ %>
+            <tr class="unit" data-user-id="<%- user.id %>">
+              <th scope="col">
+                  <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="12312312" id="flexCheckDefault">
+                  <label class="form-check-label" for="flexCheckDefault">
+                  </label>
+                </div></th>
+              <td><%- user.id %></td>
+              <td><%- user.username %></td>
+              <td><%- user.email %></td>
+              <td><%- user.RegistrationTime %></td> 
+              <td><%- user.AuthorizationTime %></td>
+              <td><%- user.role|| 'no role' %></td>    
+            </tr>       
+          <% }); %>
+    </tbody>
+  </table>
+  
+</body>
+<script type="text/javascript">  
+   function toggle(source) {
+    let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    for (let i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i] != source)
+            checkboxes[i].checked = source.checked;
+    }
+}
+
+// let row = document.querySelectorAll('.unit');
+
+// for (let i = 0; i < row.length; i++) {
+//   row[i].addEventListener('click', function() {
+//     let check = this.querySelector('.form-check-input');
+//     check.checked = !check.checked;
+//   });
+// }
+
+
+function remove(appendBox) { 
+  // disabling button for prevent double-click
+  $('#button-addon1').attr('disabled', true);
+  let items = document.getElementById(appendBox).querySelectorAll(".unit input[type='checkbox']:checked");
+  items.forEach(item => item.closest('.unit').remove());
+
+  const usersIds = Array.from(items).map(item => $(item).closest('.unit').data('userId'));
+
+    $.ajax({
+      url: "/auth/allUsers",
+      method: "DELETE",
+      dataType: 'json',
+      contentType: "application/json; charset=utf-8",
+      data: JSON.stringify({ids: usersIds}),
+      success: function(data) {
+        const { hasRedirect } = data;
+        
+        if (hasRedirect) {
+          window.location = '/auth/authorization';
+        }
+      },
+    });
+    $('#button-addon1').attr('disabled', false);
+  };
+</script>  
+</html>
